@@ -1,0 +1,7 @@
+services:
+  speedtest:
+    build: .
+    ports:
+      - "3000:80"
+    env_file:
+      - .env

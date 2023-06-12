@@ -30,16 +30,6 @@ COPY docker/servers.json /servers.json
 COPY docker/*.php /speedtest/
 COPY docker/entrypoint.sh /
 
-# Prepare environment variabiles defaults
-
-ENV TITLE=LibreSpeed
-ENV MODE=standalone
-ENV PASSWORD=password
-ENV TELEMETRY=false
-ENV ENABLE_ID_OBFUSCATION=false
-ENV REDACT_IP_ADDRESSES=false
-ENV WEBPORT=80
-
 # Final touches
 
 EXPOSE 80

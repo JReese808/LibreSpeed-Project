@@ -64,37 +64,46 @@ function format(d){
 //UI CODE
 var uiData=null;
 function startStop(){
-    if(s.getState()==3){
-		//speedtest is running, abort
-		s.abort();
-		data=null;
-		I("startStopBtn").className="";
-		initUI();
-	}else{
-		//test is not running, begin
-		I("startStopBtn").className="running";
-		I("shareArea").style.display="none";
-		s.onupdate=function(data){
-            uiData=data;
-		};
-		s.onend=function(aborted){
-            I("startStopBtn").className="";
-            updateUI(true);
-            if(!aborted){
-                //if testId is present, show sharing panel, otherwise do nothing
-                try{
-                    var testId=uiData.testId;
-                    if(testId!=null){
-                        var shareURL=window.location.href.substring(0,window.location.href.lastIndexOf("/"))+"/results/?id="+testId;
-                        I("resultsImg").src=shareURL;
-                        I("resultsURL").value=shareURL;
-                        I("testId").innerHTML=testId;
-                        I("shareArea").style.display="";
-                    }
-                }catch(e){}
-            }
-		};
-		s.start();
+
+	var mydata={}; //ADDED
+	mydata.address=document.getElementById("address").value; //ADDED
+
+	if(mydata.address!=""){
+
+    	if(s.getState()==3){
+			//speedtest is running, abort
+			s.abort();
+			data=null;
+			I("startStopBtn").className="";
+			initUI();
+		}else{
+			//test is not running, begin
+			I("startStopBtn").className="running";
+			I("shareArea").style.display="none";
+			s.onupdate=function(data){
+	            uiData=data;
+			};
+			s.onend=function(aborted){
+	            I("startStopBtn").className="";
+	            updateUI(true);
+	            if(!aborted){
+ 	               //if testId is present, show sharing panel, otherwise do nothing
+	                try{
+	                    var testId=uiData.testId;
+	                    if(testId!=null){
+ 	                       var shareURL=window.location.href.substring(0,window.location.href.lastIndexOf("/"))+"/results/?id="+testId;
+	                        I("resultsImg").src=shareURL;
+	                        I("resultsURL").value=shareURL;
+	                        I("testId").innerHTML=testId;
+	                        I("shareArea").style.display="";
+	                    }
+    	            }catch(e){}
+    	        }
+			};
+			s.setParameter("telemetry_extra", JSON.stringify(mydata)); //ADDED
+			s.start();
+		}
+
 	}
 }
 //this function reads the data sent back by the test and updates the UI
@@ -279,7 +288,13 @@ function initUI(){
 <body>
 <h1><?= getenv('TITLE') ?: 'LibreSpeed Example' ?></h1>
 <div id="testWrapper">
-	<div id="startStopBtn" onclick="startStop()"></div><br/>
+
+	<form onsubmit="return false">
+		<label for="address">Enter your address in the box:</label>
+		<input type="text" id="address" required/><br>
+		<input id="startStopBtn" onclick="startStop()" type="submit" value="Click Here"><br/>
+	</form>
+
 	<?php if(getenv("TELEMETRY")=="true"){ ?>
         <a class="privacy" href="#" onclick="I('privacyPolicy').style.display=''">Privacy</a>
 	<?php } ?>

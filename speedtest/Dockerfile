@@ -33,4 +33,5 @@ COPY docker/entrypoint.sh /
 # Final touches
 
 EXPOSE 80
+EXPOSE 443
 CMD ["bash", "/entrypoint.sh"]

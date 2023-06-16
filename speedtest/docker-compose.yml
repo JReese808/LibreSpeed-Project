@@ -1,7 +1,39 @@
 services:
   speedtest:
-    build: .
+    image: 127.0.0.1:5000/speedtest:latest
+    volumes:
+      - speedtest-data:/var/www/html
     ports:
-      - "3000:80"
+      - 8080:80
+      - 3000:443
+    container_name: speedtest
     env_file:
       - .env
+    restart: unless-stopped
+    networks:
+      - traefik-public
+    deploy:
+      placement:
+        constraints:
+          - node.labels.speedtest.speedtest-data == true
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=traefik-public
+        - traefik.constraint-label=traefik-public
+        # Configure the router to handle requests for the subdomain
+        - traefik.http.routers.speedtest-http.rule=Host(`${DOMAIN?Variable not set}`)
+        - traefik.http.routers.speedtest-http.entrypoints=http
+        - traefik.http.routers.speedtest-http.middlewares=https-redirect
+        - traefik.http.routers.speedtest-https.rule=Host(`${DOMAIN?Variable not set}`)
+        - traefik.http.routers.speedtest-https.entrypoints=https
+        - traefik.http.routers.speedtest-https.tls=true
+        - traefik.http.routers.speedtest-https.tls.certresolver=le
+        - traefik.http.services.speedtest.loadbalancer.server.port=80
+
+
+networks:
+   traefik-public:
+    external: true
+
+volumes:
+  speedtest-data:
